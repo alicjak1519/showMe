@@ -5,39 +5,28 @@ from PIL import Image
 import random
 from requests_oauthlib import OAuth2Session
 
-from oauthlib.oauth2 import BackendApplicationClient
-from requests.auth import HTTPBasicAuth
-
-from oauthlib.oauth2 import WebApplicationClient
-
 CLIENT_ID = ''
 CLIENT_SECRET = ''
 REDIRECT_URI = 'https://www.myapp.com/foo/bar'
 SCOPE = 'browse'
+AUTHORIZATION_BASE_URL = 'https://www.deviantart.com/oauth2/authorize'
+TOKEN_URL = 'https://www.deviantart.com/oauth2/token'
 
 def getKeyWords(argv):
-    return argv[1:]
+    return argv[1]
+
 
 def getToken():
-    client_id = CLIENT_ID
-    client_secret = CLIENT_SECRET
-    redirect_uri = REDIRECT_URI
-    scope = SCOPE
 
-    # WebApplication
-    # oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, scope=scope)
-    # authorization_url, state = oauth.authorization_url('https://www.deviantart.com/oauth2/authorize')
-    # authorization_response = 'https://www.deviantart.com/oauth2/authorize?client_id=11637&response_type=code&redirect_uri=https://www.myapp.com/foo/bar'
-    # token = oauth.fetch_token('https://www.deviantart.com/oauth2/authorize',
-    #                           authorization_response=authorization_response, client_secret=client_secret)
+    oauth = OAuth2Session(CLIENT_ID, redirect_uri=REDIRECT_URI, scope=SCOPE)
+    authorization_url, state = oauth.authorization_url(AUTHORIZATION_BASE_URL)
+    print(f'Please go to {authorization_url} and authorize access.')
+    # authorization_response = input('Enter the full callback URL: ')
+    code = input('Enter the code from the full callback URL: ')
+    token = oauth.fetch_token(token_url=TOKEN_URL, code=code, client_secret=CLIENT_SECRET)
 
-    # BackendApplication
-    auth = HTTPBasicAuth(client_id, client_secret)
-    client = BackendApplicationClient(client_id=client_id)
-    oauth = OAuth2Session(client=client)
-    token = oauth.fetch_token(token_url='https://www.deviantart.com/oauth2/token', auth=auth)
+    return token['access_token']
 
-    return token
 
 def main(argv):
     token = getToken()
