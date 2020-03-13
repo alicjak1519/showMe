@@ -1,0 +1,6 @@
+sys
+requests
+shutil
+PIL
+random
+requests_oauthlib
